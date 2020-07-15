@@ -52,13 +52,24 @@ if (!(Test-Path $OutTiles)) {
 	New-Item -ItemType Directory -Path $OutTiles -Force | Out-Null
 }
 
-$ImageType = if ($Type -eq "aerial") {"jpeg"} else {"png"}
+$ImageType = @{
+	"map" = "png"
+	"nautical" = "png"
+	"aerial" = "jpeg"
+	"historic" = "jpeg"
+}[$Type]
+$MapLayer = @{
+	"map" = "map"
+	"nautical" = "nautical"
+	"aerial" = "aerial"
+	"historic" = "se_aerial_1950_60s"
+}[$Type]
 
 $Urls = @()
 for ($yy = [Math]::Floor($Y + $Side / 2); $yy -ge [Math]::Floor($Y - $Side / 2) + 1; $yy--) {
 	for ($xx = [Math]::Floor($X - $Side / 2) + 1; $xx -le [Math]::Floor($X + $Side / 2); $xx++) {
 		$Urls += @{
-			Uri      = "https://map04.eniro.no/geowebcache/service/tms1.0.0/$Type/$Zoom/$xx/$yy.$ImageType"
+			Uri      = "https://map04.eniro.no/geowebcache/service/tms1.0.0/$MapLayer/$Zoom/$xx/$yy.$ImageType"
 			FileName = Join-Path $OutTiles "$Type-$Zoom-$xx-$yy.$ImageType"
 		}
 	}
