@@ -9,28 +9,39 @@ and extract it in to `.\ImageMagick\`
 
 ## Usage
 
-Call `.\EniroDL.ps1` with the first two arguments being the x- and y-position of
-the desired center tile and the third argument the zoom level. More [arguments](#Arguments)
-are available below for more specific needs.
+Call `.\EniroDL.ps1` with the first two arguments being the latitude and
+longitude for the center of the map and the third argument the zoom level. More
+[arguments](#Arguments) are available below for more specific needs.
 
 ### Examples
 
 Quick and easy:
 ```PowerShell
-.\EniroDL.ps1 8727 11416 14
+.\EniroDL.ps1 57.611808 11.771765 14
 ```
 
 All arguments explicitly:
 ```PowerShell
-.\EniroDL.ps1 -X 8727 -Y 11416 -Zoom 14 -Side 4 -Type aerial -Out .
+.\EniroDL.ps1 -Lat 57.611808 -Lon 11.771765 -Zoom 14 -Side 4 -Type aerial -Out .
 ```
 
 Full power and simple:
 ```PowerShell
-.\EniroDL.ps1 8727 11416 14 -S 4 -O .
+.\EniroDL.ps1 57.611808 11.771765 14 -S 4 -O .
 ```
 
 ### Arguments
+
+**Coordinates**  
+Either use `-Lat` and `-Lon` **or** `-X` and `-Y`
+
+**`-Lat`** <small>(Mandatory)</small>  
+The latitude for the center of the map.  
+Can be deduced from position.
+
+**`-Lon`** <small>(Mandatory)</small>  
+The longitude for the center of the map.  
+Can be deduced from position.
 
 **`-X`** <small>(Mandatory)</small>  
 The x-position of the center tile.
@@ -39,7 +50,8 @@ The x-position of the center tile.
 The y-position of the center tile.
 
 **`-Zoom`** <small>(Mandatory)</small>  
-The zoom level.
+The zoom level.  
+Can be deduced from position.
 
 **`-Type`**  
 The map type to download.  

@@ -2,6 +2,10 @@
 	.SYNOPSIS
 	Download a chunk of map from Eniro.
 
+	.PARAMETER Latitude
+	The latitude for the center of the map.
+	.PARAMETER Longitude
+	The longitude for the center of the map.
 	.PARAMETER X
 	The x-position of the center tile.
 	.PARAMETER Y
@@ -17,18 +21,40 @@
 	The output directory.
 #>
 
+[CmdletBinding(
+	DefaultParameterSetName = "latlon"
+)]
 param (
 	[Parameter(
 		Mandatory = $true,
-		Position = 0)]
+		Position = 0,
+		ParameterSetName = "latlon"
+	)]
+	[Alias("Lat")]
+	[double]
+	$Latitude,
+	[Parameter(
+		Mandatory = $true,
+		Position = 1,
+		ParameterSetName = "latlon"
+	)]
+	[Alias("Lon")]
+	[double]
+	$Longitude,
+
+	[Parameter(
+		Mandatory = $true,
+		ParameterSetName = "tile"
+	)]
 	[int]
 	$X,
 	[Parameter(
 		Mandatory = $true,
-		Position = 1
+		ParameterSetName = "tile"
 	)]
 	[int]
 	$Y,
+
 	[Parameter(
 		Mandatory = $true,
 		Position = 2
@@ -47,6 +73,11 @@ param (
 	$Out = "Out"
 )
 
+if ($PSCmdlet.ParameterSetName -eq "latlon") {
+	$X = [Math]::Floor(($Longitude + 180) / 360 * [Math]::Pow(2, $Zoom))
+	$Y = [Math]::Pow(2, $Zoom) - [Math]::Floor((1 - [Math]::Log([Math]::Tan($Latitude * [Math]::PI / 180) + 1 / [Math]::Cos($Latitude * [Math]::PI / 180)) / [Math]::PI) / 2 * [Math]::Pow(2, $Zoom)) - 1
+}
+
 $OutTiles = Join-Path $Out "Tiles"
 
 if (!(Test-Path $OutTiles)) {
@@ -54,15 +85,15 @@ if (!(Test-Path $OutTiles)) {
 }
 
 $ImageType = @{
-	"map" = "png"
+	"map"      = "png"
 	"nautical" = "png"
-	"aerial" = "jpeg"
+	"aerial"   = "jpeg"
 	"historic" = "jpeg"
 }[$Type]
 $MapLayer = @{
-	"map" = "map"
+	"map"      = "map"
 	"nautical" = "nautical"
-	"aerial" = "aerial"
+	"aerial"   = "aerial"
 	"historic" = "se_aerial_1950_60s"
 }[$Type]
 
