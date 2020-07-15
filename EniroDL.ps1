@@ -9,7 +9,8 @@
 	.PARAMETER Zoom
 	The zoom level.
 	.PARAMETER Type
-	The type to download.
+	The map type to download.
+	The different types are: map, nautical, aerial, and historic.
 	.PARAMETER Side
 	The number of tiles at the side of the map.
 	.PARAMETER Out
