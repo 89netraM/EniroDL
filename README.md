@@ -33,25 +33,29 @@ Full power and simple:
 ### Arguments
 
 **Coordinates**  
-Either use `-Lat` and `-Lon` **or** `-X` and `-Y`
+Either use `-Lat` and `-Lon` **or** `-X` and `-Y` together with `-Zoom`, **or**
+`-URL` alone.
 
 **`-Lat`** <small>(Mandatory)</small>  
 The latitude for the center of the map.  
-Can be deduced from position.
-
+Can be deduced from position.  
 **`-Lon`** <small>(Mandatory)</small>  
 The longitude for the center of the map.  
 Can be deduced from position.
 
 **`-X`** <small>(Mandatory)</small>  
-The x-position of the center tile.
-
+The x-position of the center tile.  
 **`-Y`** <small>(Mandatory)</small>  
 The y-position of the center tile.
 
 **`-Zoom`** <small>(Mandatory)</small>  
 The zoom level.  
 Can be deduced from position.
+
+**`-URL`** <small>(Mandatory)</small>  
+A Eniro URL to a point on the map.  
+Provides latitude, longitude and zoom, and optionally the type.  
+Can also be piped in.
 
 **`-Type`**  
 The map type to download.  

@@ -2,6 +2,9 @@
 	.SYNOPSIS
 	Download a chunk of map from Eniro.
 
+	.PARAMETER URL
+	A Eniro URL to a point on the map.
+	Example: https://kartor.eniro.se/?c=57.611808,11.771765&z=14&l=nautical
 	.PARAMETER Latitude
 	The latitude for the center of the map.
 	.PARAMETER Longitude
@@ -25,6 +28,17 @@
 	DefaultParameterSetName = "latlon"
 )]
 param (
+	[Parameter(
+		Mandatory = $true,
+		ValueFromPipeline = $true,
+		Position = 0,
+		ParameterSetName = "url"
+	)]
+	[ValidatePattern("c=\d+(\.\d+),\d+(\.\d+)")]
+	[ValidatePattern("z=\d+")]
+	[string]
+	$URL,
+
 	[Parameter(
 		Mandatory = $true,
 		Position = 0,
@@ -57,7 +71,13 @@ param (
 
 	[Parameter(
 		Mandatory = $true,
-		Position = 2
+		Position = 2,
+		ParameterSetName = "latlon"
+	)]
+	[Parameter(
+		Mandatory = $true,
+		Position = 2,
+		ParameterSetName = "tile"
 	)]
 	[int]
 	$Zoom,
@@ -73,9 +93,28 @@ param (
 	$Out = "Out"
 )
 
-if ($PSCmdlet.ParameterSetName -eq "latlon") {
-	$X = [Math]::Floor(($Longitude + 180) / 360 * [Math]::Pow(2, $Zoom))
-	$Y = [Math]::Pow(2, $Zoom) - [Math]::Floor((1 - [Math]::Log([Math]::Tan($Latitude * [Math]::PI / 180) + 1 / [Math]::Cos($Latitude * [Math]::PI / 180)) / [Math]::PI) / 2 * [Math]::Pow(2, $Zoom)) - 1
+function LonToX([double] $lon) {
+	return [Math]::Floor(($lon + 180) / 360 * [Math]::Pow(2, $Zoom))
+}
+function LatToY([double] $lat) {
+	return [Math]::Pow(2, $Zoom) - [Math]::Floor((1 - [Math]::Log([Math]::Tan($lat * [Math]::PI / 180) + 1 / [Math]::Cos($lat * [Math]::PI / 180)) / [Math]::PI) / 2 * [Math]::Pow(2, $Zoom)) - 1
+}
+
+if ($PSCmdlet.ParameterSetName -eq "url") {
+	$URL -match "z=(\d+)" | Out-Null
+	$Zoom = ($Matches[1] / 1)
+
+	$URL -match "c=(\d+(?:\.\d+)),(\d+(?:\.\d+))" | Out-Null
+	$X = LonToX ($Matches[2] / 1.0)
+	$Y = LatToY ($Matches[1] / 1.0)
+
+	if (!$PSBoundParameters.ContainsKey("Type") -and $URL -match "l=(\w+)") {
+		$Type = $Matches[1]
+	}
+}
+elseif ($PSCmdlet.ParameterSetName -eq "latlon") {
+	$X = LonToX $Longitude
+	$Y = LatToY $Latitude
 }
 
 $OutTiles = Join-Path $Out "Tiles"
