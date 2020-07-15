@@ -8,6 +8,8 @@
 	The y-position of the center tile.
 	.PARAMETER Zoom
 	The zoom level.
+	.PARAMETER Type
+	The type to download.
 	.PARAMETER Side
 	The number of tiles at the side of the map.
 	.PARAMETER Out
@@ -32,6 +34,10 @@ param (
 	)]
 	[int]
 	$Zoom,
+	[ValidateSet("map", "nautical", "aerial", "historic")]
+	[Alias("T")]
+	[string]
+	$Type = "nautical",
 	[int]
 	[Alias("S")]
 	$Side = 9,
@@ -46,12 +52,14 @@ if (!(Test-Path $OutTiles)) {
 	New-Item -ItemType Directory -Path $OutTiles -Force | Out-Null
 }
 
+$ImageType = if ($Type -eq "aerial") {"jpeg"} else {"png"}
+
 $Urls = @()
 for ($yy = [Math]::Floor($Y + $Side / 2); $yy -ge [Math]::Floor($Y - $Side / 2) + 1; $yy--) {
 	for ($xx = [Math]::Floor($X - $Side / 2) + 1; $xx -le [Math]::Floor($X + $Side / 2); $xx++) {
 		$Urls += @{
-			Uri      = "https://map04.eniro.no/geowebcache/service/tms1.0.0/nautical/$Zoom/$xx/$yy.png"
-			FileName = Join-Path $OutTiles "$Zoom-$xx-$yy.png"
+			Uri      = "https://map04.eniro.no/geowebcache/service/tms1.0.0/$Type/$Zoom/$xx/$yy.$ImageType"
+			FileName = Join-Path $OutTiles "$Type-$Zoom-$xx-$yy.$ImageType"
 		}
 	}
 }
