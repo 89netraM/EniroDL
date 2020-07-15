@@ -58,12 +58,14 @@ param (
 
 	[Parameter(
 		Mandatory = $true,
+		Position = 0,
 		ParameterSetName = "tile"
 	)]
 	[int]
 	$X,
 	[Parameter(
 		Mandatory = $true,
+		Position = 1,
 		ParameterSetName = "tile"
 	)]
 	[int]
