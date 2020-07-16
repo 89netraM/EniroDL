@@ -148,10 +148,10 @@ for ($yy = [Math]::Floor($Y + $Side / 2); $yy -ge [Math]::Floor($Y - $Side / 2) 
 	}
 }
 
-$Urls | ForEach-Object -Parallel {
-	if (!(Test-Path $_.FileName)) {
-		Invoke-WebRequest -Uri $_.Uri -OutFile $_.FileName
-	}
+$workers = $Urls | Where-Object { !(Test-Path $_.FileName) } | ForEach-Object {
+	$client = New-Object System.Net.WebClient
+	$client.DownloadFileTaskAsync($_.Uri, $_.FileName)
 }
+$workers | ForEach-Object { $_.Wait() }
 
 Start-Process ".\ImageMagick\montage" "-tile $($Side)x$($Side) -geometry +0+0 $($Urls | Join-String -Separator " " -Property "FileName") $(Join-Path $Out "Map.png")" -NoNewWindow
